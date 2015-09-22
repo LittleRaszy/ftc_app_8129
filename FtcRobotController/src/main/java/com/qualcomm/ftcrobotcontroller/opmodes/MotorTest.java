@@ -18,7 +18,7 @@ public class MotorTest extends OpMode
     //  Create private runtime function using ElapsedTime function
 
     public MotorTest()
-    //  Constructer to save information
+    //  Constructor to save information
     {
 
     }
