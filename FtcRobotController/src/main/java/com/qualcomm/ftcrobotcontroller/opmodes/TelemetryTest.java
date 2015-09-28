@@ -35,7 +35,7 @@ public class TelemetryTest extends OpMode {
 
         telemetry.addData("Gamepad 1", String.format("Left = (%f,%f), Right = (%f,%f)", c1_xValLeft, c1_yValLeft, c1_xValRight, c1_yValRight));
         telemetry.addData("Gamepad 2", String.format("Left = (%f,%f), Right = (%f,%f)", c2_xValLeft, c2_yValLeft, c2_xValRight, c2_yValRight));
-        telemetry.addData("Runtime", String.format("Robot has been running for %f seconds", runtime));
+        telemetry.addData("Runtime", String.format("Robot has been running for % seconds", runtime));
 
     }
 }
