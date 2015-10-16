@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class TelemetryTest extends OpMode {
 
-    private ElapsedTime runtime = new ElapsedTime();
-
     public TelemetryTest ()
     {
 
@@ -15,7 +13,7 @@ public class TelemetryTest extends OpMode {
     @Override
     public void init()
     {
-        runtime.reset();
+        resetStartTime();
     }
 
     @Override
@@ -33,9 +31,9 @@ public class TelemetryTest extends OpMode {
         double c2_yValLeft = gamepad2.left_stick_y;
         double c2_xValLeft = gamepad2.left_stick_x;
 
-        telemetry.addData("Gamepad 1", String.format("Left = (%f,%f), Right = (%f,%f)", c1_xValLeft, c1_yValLeft, c1_xValRight, c1_yValRight));
-        telemetry.addData("Gamepad 2", String.format("Left = (%f,%f), Right = (%f,%f)", c2_xValLeft, c2_yValLeft, c2_xValRight, c2_yValRight));
-        telemetry.addData("Runtime", String.format("Robot has been running for %f seconds", runtime));
+        telemetry.addData("Gamepad 1", String.format("Left = (%1.3f,%1.3f), Right = (%1.3f,%1.3f)", c1_xValLeft, c1_yValLeft, c1_xValRight, c1_yValRight));
+        telemetry.addData("Gamepad 2", String.format("Left = (%1.3f,%1.3f), Right = (%1.3f,%1.3f)", c2_xValLeft, c2_yValLeft, c2_xValRight, c2_yValRight));
+        telemetry.addData("Runtime", String.format("Robot has been running for %3.1f seconds", getRuntime()));
 
     }
 }

@@ -40,7 +40,7 @@ public class MotorTest extends OpMode
 
         motorRight.setPower(c1_RightY);
         //  Set right motor to right joystick
-        motorRight.setPower(c1_LeftY);
+        motorLeft.setPower(c1_LeftY);
         //  Set left motor to left joystick
 
     }
