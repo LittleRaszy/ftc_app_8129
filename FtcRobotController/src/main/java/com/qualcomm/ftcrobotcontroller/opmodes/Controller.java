@@ -86,7 +86,7 @@ public class Controller extends OpMode
         //  If quadratic function is to be used
         {
             nType = 2;
-            //  Set numeral type to zero
+            //  Set numeral type to two
         }
 
         if (type.equals("log"))
@@ -142,6 +142,7 @@ public class Controller extends OpMode
         }
 
         return value;
+        //  Once value is set, return scaled value
     }
 
 }
