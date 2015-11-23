@@ -1,18 +1,25 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-public class CaneBotAutonTest extends CaneBotAutonSetup {
+public class TuleAutonTest extends TuleTelemetry {
 
-    public CaneBotAutonTest() {
+    public TuleAutonTest() {
 
     }
 
     @Override
+    public void start() {
+        super.start();
+        resetDriveEncoders();
+        resetArmEncoder();
+    }
+
+    @Override
     public void loop() {
-        switch (state) {
+        switch (getState()) {
             case 0:
                 resetDriveEncoders();
                 resetArmEncoder();
-                state++;
+                waitForReset();
                 break;
             case 1:
                 checkTime();
@@ -24,6 +31,7 @@ public class CaneBotAutonTest extends CaneBotAutonSetup {
                 break;
             case 3:
                 checkTime();
+                runWithEncoders();
                 linearMove("right",180,1.0f);
                 break;
             case 4:
@@ -31,6 +39,7 @@ public class CaneBotAutonTest extends CaneBotAutonSetup {
                 break;
             case 5:
                 checkTime();
+                runWithEncoders();
                 linearMove("forwards",60,1.0f);
                 break;
             case 6:
@@ -44,7 +53,7 @@ public class CaneBotAutonTest extends CaneBotAutonSetup {
                 break;
         }
 
-        telemetry.addData("0.3", "State: " + state);
+        telemetry.addData("0.2", "State: " + getState());
         updateTelemetry();
     }
 }

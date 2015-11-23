@@ -5,13 +5,30 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.Range;
 
-public class CaneBotHardware extends OpMode {
+public class TuleHardware extends OpMode {
 
-    double servoLid_OPEN = 0.500;
-    double servoLid_CLOSE = 0.000;
+    final double COUNTS_PER_REVOLUTION_N40 = 1120;
+    final double COUNTS_PER_REVOLUTION_N60 = 1680;
+    final double GEAR_RATIO_DRIVE = 2;
+    final double GEAR_RATIO_ARM = 1;
+    final double GEAR_RATIO_DUMP = 3;
+    final double GEARS_PER_INCH_ARM = 11;
+    final double WHEEL_DIAMETER = 5;
+    final double TURN_DIAMETER = 16;
+    final double COUNTS_PER_INCH_DRIVE =
+            COUNTS_PER_REVOLUTION_N40*GEAR_RATIO_DRIVE/(WHEEL_DIAMETER*Math.PI);
+    final double COUNTS_PER_INCH_ARM =
+            COUNTS_PER_REVOLUTION_N40*GEAR_RATIO_ARM/GEARS_PER_INCH_ARM;
+    final double COUNTS_PER_DEGREE_DRIVE =
+            (COUNTS_PER_INCH_DRIVE*Math.PI*TURN_DIAMETER)/360;
+    final double COUNTS_PER_DEGREE_DUMP =
+            COUNTS_PER_REVOLUTION_N60*GEAR_RATIO_DUMP/360;
 
-    public CaneBotHardware() {
+    private int state = 0;
+
+    public TuleHardware() {
 
     }
 
@@ -67,7 +84,8 @@ public class CaneBotHardware extends OpMode {
 
     @Override
     public void start() {
-
+        motorKill();
+        resetStartTime();
     }
 
     @Override
@@ -142,12 +160,13 @@ public class CaneBotHardware extends OpMode {
 
     void resetDriveEncoders() {
         if (motorLeft != null) {
-            motorLeft.setChannelMode(
+            motorLeft.setMode(
                     DcMotorController.RunMode.RESET_ENCODERS);
         }
         if (motorRight != null) {
-            motorRight.setChannelMode(
-                    DcMotorController.RunMode.RESET_ENCODERS);
+            motorRight.setMode(
+                    DcMotorController.RunMode.RESET_ENCODERS
+            );
         }
     }
 
@@ -183,9 +202,17 @@ public class CaneBotHardware extends OpMode {
 
     void resetArmEncoder() {
         if (motorArm != null) {
-            motorArm.setChannelMode(
+            motorArm.setMode(
                     DcMotorController.RunMode.RESET_ENCODERS);
         }
+    }
+
+    int motorDump_Position() {
+        int position = 0;
+        if (motorDump != null) {
+            position = motorDump.getCurrentPosition();
+        }
+        return position;
     }
 
     double motorDump_Power() {
@@ -202,6 +229,37 @@ public class CaneBotHardware extends OpMode {
         }
     }
 
+	void runDumpEncoder() {
+		if (motorDump != null) {
+			motorDump.setMode(
+					DcMotorController.RunMode.RUN_USING_ENCODERS);
+		}
+	}
+	
+    void resetDumpEncoder() {
+        if (motorDump != null) {
+            motorDump.setMode(
+                    DcMotorController.RunMode.RESET_ENCODERS);
+        }
+    }
+	
+	void setDumpPosition(String direction, double position) {
+		runDumpEncoder();
+		int counts = (int)(position*COUNTS_PER_DEGREE_DUMP);
+		if (direction.equals("left")) {
+			setDumpPower(1.0f);
+            if (motorDump_Position() >= counts) {
+                setDumpPower(0.0f);
+            }
+		}
+		if (direction.equals("right")) {
+			setDumpPower(-1.0f);
+            if (motorDump_Position() <= (-1*counts)) {
+                setDumpPower(0.0f);
+            }
+		}
+	}
+
     double servoLid_Position() {
         double position = 0.0;
         if (servoLid != null) {
@@ -216,29 +274,114 @@ public class CaneBotHardware extends OpMode {
         setDumpPower(0);
     }
 
-    void setLidPosition(String position) {
+    void setLidPosition(double position) {
+        Range.clip(position, 0.0f, 1.0f);
         if (servoLid != null) {
-            if (position.equals("open")) {
-                servoLid.setPosition(servoLid_OPEN);
-            }
-            if (position.equals("close")) {
-                servoLid.setPosition(servoLid_CLOSE);
+            if (position >= 0 && position <= 1) {
+                servoLid.setPosition(position);
             }
         }
     }
 
     void runWithEncoders() {
         if (motorLeft != null) {
-            motorLeft.setChannelMode(
+            motorLeft.setMode(
                     DcMotorController.RunMode.RUN_USING_ENCODERS);
         }
         if (motorRight != null) {
-            motorRight.setChannelMode(
+            motorRight.setMode(
                     DcMotorController.RunMode.RUN_USING_ENCODERS);
         }
         if (motorArm != null) {
-            motorArm.setChannelMode(
+            motorArm.setMode(
                     DcMotorController.RunMode.RUN_USING_ENCODERS);
+        }
+        if (motorDump != null) {
+            motorDump.setMode(
+                    DcMotorController.RunMode.RUN_USING_ENCODERS);
+        }
+    }
+
+    void waitForReset() {
+        if (driveEncodersReset()) {
+            state++;
+        }
+    }
+
+    void checkTime() {
+        if (getRuntime() >= 30) {
+            state = 999;
+        }
+    }
+
+    int getState() {
+        return state;
+    }
+
+    void nextState() {
+        state++;
+    }
+
+    void linearMove(String movement, double distance, double power) {
+        if (movement.equals("forwards")) {
+            distance = distance*COUNTS_PER_INCH_DRIVE;
+            setDrivePower(power,power);
+            if (Math.abs(motorLeft_Position()) >= distance) {
+                setLeftPower(0.0f);
+            }
+            if (Math.abs(motorRight_Position()) >= distance) {
+                setRightPower(0.0f);
+            }
+            if (Math.abs(motorLeft_Position()) >= distance && Math.abs(motorRight_Position()) >= distance) {
+                setDrivePower(0.0f,0.0f);
+                resetDriveEncoders();
+                nextState();
+            }
+        }
+        if (movement.equals("backwards")) {
+            distance = distance*COUNTS_PER_INCH_DRIVE;
+            setDrivePower(-power,-power);
+            if (Math.abs(motorLeft_Position()) >= distance) {
+                setLeftPower(0.0f);
+            }
+            if (Math.abs(motorRight_Position()) >= distance) {
+                setRightPower(0.0f);
+            }
+            if (Math.abs(motorLeft_Position()) >= distance && Math.abs(motorRight_Position()) >= distance) {
+                setDrivePower(0.0f,0.0f);
+                resetDriveEncoders();
+                nextState();
+            }
+        }
+        if (movement.equals("right")) {
+            distance = distance*COUNTS_PER_DEGREE_DRIVE;
+            setDrivePower(power,-power);
+            if (Math.abs(motorLeft_Position()) >= distance) {
+                setLeftPower(0.0f);
+            }
+            if (Math.abs(motorRight_Position()) >= distance) {
+                setRightPower(0.0f);
+            }
+            if (Math.abs(motorLeft_Position()) >= distance && Math.abs(motorRight_Position()) >= distance) {
+                setDrivePower(0.0f,0.0f);
+                resetDriveEncoders();
+                nextState();
+            }
+        }
+        if (movement.equals("left")) {
+            distance = distance*COUNTS_PER_DEGREE_DRIVE;
+            setDrivePower(-power,power);
+            if (Math.abs(motorLeft_Position()) >= distance) {
+                setLeftPower(0.0f);
+            }
+            if (Math.abs(motorRight_Position()) >= distance) {
+                setRightPower(0.0f);
+            }
+            if (Math.abs(motorLeft_Position()) >= distance && Math.abs(motorRight_Position()) >= distance) {
+                setDrivePower(0.0f,0.0f);
+                resetDriveEncoders();
+                nextState();
+            }
         }
     }
 
