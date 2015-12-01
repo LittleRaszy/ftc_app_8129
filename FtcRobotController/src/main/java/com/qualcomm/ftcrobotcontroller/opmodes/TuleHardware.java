@@ -14,17 +14,22 @@ public class TuleHardware extends OpMode {
     final double GEAR_RATIO_DRIVE = 2;
     final double GEAR_RATIO_ARM = 1;
     final double GEAR_RATIO_DUMP = 3;
+    final double GEAR_RATIO_PIVOT = 20;
     final double GEARS_PER_INCH_ARM = 11;
     final double WHEEL_DIAMETER = 5;
     final double TURN_DIAMETER = 16;
+
     final double COUNTS_PER_INCH_DRIVE =
             COUNTS_PER_REVOLUTION_N40*GEAR_RATIO_DRIVE/(WHEEL_DIAMETER*Math.PI);
     final double COUNTS_PER_INCH_ARM =
             COUNTS_PER_REVOLUTION_N40*GEAR_RATIO_ARM/GEARS_PER_INCH_ARM;
+
     final double COUNTS_PER_DEGREE_DRIVE =
             (COUNTS_PER_INCH_DRIVE*Math.PI*TURN_DIAMETER)/360;
     final double COUNTS_PER_DEGREE_DUMP =
-            COUNTS_PER_REVOLUTION_N60*GEAR_RATIO_DUMP/360;
+            (COUNTS_PER_REVOLUTION_N60*GEAR_RATIO_DUMP)/360;
+    final double COUNTS_PER_DEGREE_PIVOT =
+            (COUNTS_PER_REVOLUTION_N60*GEAR_RATIO_PIVOT)/360;
 
     private int state = 0;
 
@@ -74,6 +79,14 @@ public class TuleHardware extends OpMode {
         }
 
         try {
+            motorPivot = hardwareMap.dcMotor.get("pivot");
+        } catch (Exception exception) {
+            addWarningMessage("Pivot Motor");
+            DbgLog.msg(exception.getLocalizedMessage());
+            motorPivot = null;
+        }
+
+        try {
             servoLid = hardwareMap.servo.get("lid");
         } catch (Exception exception) {
             addWarningMessage("Lid Servo");
@@ -110,7 +123,7 @@ public class TuleHardware extends OpMode {
     }
 
     double motorLeft_Power() {
-        double power = 0.0;
+        double power = 0.0f;
         if (motorLeft != null) {
             power = motorLeft.getPower();
         }
@@ -132,7 +145,7 @@ public class TuleHardware extends OpMode {
     }
 
     double motorRight_Power() {
-        double power = 0.0;
+        double power = 0.0f;
         if (motorRight != null) {
             power = motorRight.getPower();
         }
@@ -179,7 +192,7 @@ public class TuleHardware extends OpMode {
     }
 
     double motorArm_Power() {
-        double power = 0.0;
+        double power = 0.0f;
         if (motorArm != null) {
             power = motorArm.getPower();
         }
@@ -216,7 +229,7 @@ public class TuleHardware extends OpMode {
     }
 
     double motorDump_Power() {
-        double power = 0.0;
+        double power = 0.0f;
         if (motorDump != null) {
             power = motorDump.getPower();
         }
@@ -232,7 +245,7 @@ public class TuleHardware extends OpMode {
 	void runDumpEncoder() {
 		if (motorDump != null) {
 			motorDump.setMode(
-					DcMotorController.RunMode.RUN_USING_ENCODERS);
+                    DcMotorController.RunMode.RUN_USING_ENCODERS);
 		}
 	}
 	
@@ -259,6 +272,35 @@ public class TuleHardware extends OpMode {
             }
 		}
 	}
+
+    int motorPivot_Position() {
+        int position = 0;
+        if (motorPivot != null) {
+            position = motorPivot.getCurrentPosition();
+        }
+        return position;
+    }
+
+    double motorPivot_Power() {
+        double power = 0.0f;
+        if (motorPivot != null) {
+            power = motorPivot.getPower();
+        }
+        return power;
+    }
+
+    void setPivotPower(double power) {
+        if (motorPivot != null) {
+            motorPivot.setPower(power);
+        }
+    }
+
+    void resetPivotEncoder() {
+        if (motorPivot != null) {
+            motorPivot.setMode(
+                    DcMotorController.RunMode.RESET_ENCODERS);
+        }
+    }
 
     double servoLid_Position() {
         double position = 0.0;
@@ -300,6 +342,10 @@ public class TuleHardware extends OpMode {
             motorDump.setMode(
                     DcMotorController.RunMode.RUN_USING_ENCODERS);
         }
+        if (motorPivot != null) {
+            motorPivot.setMode(
+                    DcMotorController.RunMode.RUN_USING_ENCODERS);
+        }
     }
 
     void waitForReset() {
@@ -323,7 +369,7 @@ public class TuleHardware extends OpMode {
     }
 
     void linearMove(String movement, double distance, double power) {
-        if (movement.equals("forwards")) {
+        if (movement.equals("forward")) {
             distance = distance*COUNTS_PER_INCH_DRIVE;
             setDrivePower(power,power);
             if (Math.abs(motorLeft_Position()) >= distance) {
@@ -389,6 +435,7 @@ public class TuleHardware extends OpMode {
     private DcMotor motorRight;
     private DcMotor motorArm;
     private DcMotor motorDump;
+    private DcMotor motorPivot;
 
     private Servo servoLid;
 }

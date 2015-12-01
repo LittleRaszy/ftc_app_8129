@@ -12,6 +12,7 @@ public class TuleController extends TuleTelemetry {
         motorKill();
         resetStartTime();
         setLidPosition(0.0f);
+        resetDumpEncoder();
     }
 
     @Override
@@ -22,7 +23,9 @@ public class TuleController extends TuleTelemetry {
         setDrivePower(c1_LeftY, c1_RightY);
 
         double c2_RightY = -gamepad2.right_stick_y;
+        double c2_LeftY = -gamepad2.left_stick_y;
         setArmPower(c2_RightY);
+        setPivotPower(c2_LeftY);
 
         if (gamepad2.back) {
             resetDumpEncoder();
