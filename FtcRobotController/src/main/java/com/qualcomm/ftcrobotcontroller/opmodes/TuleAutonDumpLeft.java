@@ -1,8 +1,8 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-public class TuleAutonMain extends TuleTelemetry {
+public class TuleAutonDumpLeft extends TuleTelemetry {
 
-    public TuleAutonMain() {
+    public TuleAutonDumpLeft() {
 
     }
 
@@ -11,20 +11,20 @@ public class TuleAutonMain extends TuleTelemetry {
         super.start();
         resetDriveEncoders();
         resetArmEncoder();
-        resetDumpEncoder();
-        resetPivotEncoder();
     }
 
     @Override
     public void loop() {
         switch (getState()) {
             case 0:
+                resetDriveEncoders();
+                resetArmEncoder();
                 waitForReset();
                 break;
             case 1:
                 checkTime();
                 runWithEncoders();
-                linearMove("forward", 3, 1.0f);
+                setArmPosition("up", 2);
                 break;
             case 2:
                 waitForReset();
@@ -32,7 +32,7 @@ public class TuleAutonMain extends TuleTelemetry {
             case 3:
                 checkTime();
                 runWithEncoders();
-                linearMove("left", 45, 1.0f);
+                linearMove("forward", 3, 1.0f);
                 break;
             case 4:
                 waitForReset();
@@ -40,7 +40,7 @@ public class TuleAutonMain extends TuleTelemetry {
             case 5:
                 checkTime();
                 runWithEncoders();
-                linearMove("forward", 102, 1.0f);
+                linearMove("left", 45, 1.0f);
                 break;
             case 6:
                 waitForReset();
@@ -48,9 +48,40 @@ public class TuleAutonMain extends TuleTelemetry {
             case 7:
                 checkTime();
                 runWithEncoders();
-                linearMove("left", 45, 1.0f);
+                linearMove("forward", 94, 1.0f);
                 break;
             case 8:
+                waitForReset();
+                break;
+            case 9:
+                checkTime();
+                runWithEncoders();
+                linearMove("left", 45, 1.0f);
+                break;
+            case 10:
+                waitForReset();
+                break;
+            case 11:
+                checkTime();
+                runWithEncoders();
+                linearMove("forward", 3, 1.0f);
+                break;
+            case 12:
+                waitForReset();
+                break;
+            case 13:
+                checkTime();
+                runWithEncoders();
+                setArmPosition("up", 4);
+                break;
+            case 14:
+                checkTime();
+                setClimberPosition(0.6f);
+                if (servoClimber_Position() == 0.6f) {
+                    nextState();
+                }
+                break;
+            case 15:
                 waitForReset();
                 break;
             case 999:
@@ -62,5 +93,7 @@ public class TuleAutonMain extends TuleTelemetry {
                 motorKill();
                 break;
         }
+
+        updateTelemetry();
     }
 }

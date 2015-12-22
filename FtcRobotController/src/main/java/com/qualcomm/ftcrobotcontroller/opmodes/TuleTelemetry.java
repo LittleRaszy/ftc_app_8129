@@ -18,25 +18,31 @@ public class TuleTelemetry extends TuleHardware {
         telemetry.addData("1.0",
                 "Left Drive: "
                         + motorLeft_Power()*100 + "% Power, "
-                        + motorLeft_Position()/COUNTS_PER_INCH_DRIVE + " Inches");
+                        + motorLeft_Position() + " Counts");
         telemetry.addData("1.1",
                 "Right Drive: "
                         + motorRight_Power()*100 + "% Power, "
-                        + motorRight_Position()/COUNTS_PER_DEGREE_DRIVE + " Inches");
+                        + motorRight_Position() + " Counts");
         telemetry.addData("1.2",
                 "Arm Motor: "
                         + motorArm_Power()*100 + "% Power, "
-                        + motorArm_Position()/COUNTS_PER_INCH_ARM + " Inches");
+                        + motorArm_Position() + " Counts");
         telemetry.addData("1.3",
                 "Dump Motor: "
                         + motorDump_Power()*100 + "% Power"
-                        + motorDump_Position()/COUNTS_PER_DEGREE_DUMP + " Degrees");
+                        + motorDump_Position() + " Counts");
         telemetry.addData("1.4",
                 "Pivot Motor: "
                         + motorPivot_Power()*100 + "% Power"
-                        + motorPivot_Position()/COUNTS_PER_DEGREE_PIVOT + " Degrees");
+                        + motorPivot_Position() + " Counts");
         telemetry.addData("2.0",
                 "Lid Servo: "
-                        + servoLid_Position()*270 + " Degrees");
+                        + (int)(servoLid_Position()*180) + " Degrees");
+        telemetry.addData("2.1",
+                "Right Lever Servo: "
+                        + (int)(servoRightLever_position()*180) + " Degrees");
+        telemetry.addData("2.2",
+                "Left Lever Servo: "
+                        + (int)(servoLeftLever_position()*180) + " Degrees");
     }
 }

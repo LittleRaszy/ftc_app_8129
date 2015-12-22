@@ -2,58 +2,68 @@ package com.qualcomm.ftcrobotcontroller.opmodes;
 
 public class TuleController extends TuleTelemetry {
 
+    boolean reverseControl = false;
+
     public TuleController() {
 
     }
 
     @Override
     public void start() {
+		
         super.start();
-        motorKill();
-        resetStartTime();
-        setLidPosition(0.0f);
-        resetDumpEncoder();
     }
 
     @Override
     public void loop() {
 
-        double c1_RightY = -gamepad1.right_stick_y;
-        double c1_LeftY = -gamepad1.left_stick_y;
-        setDrivePower(c1_LeftY, c1_RightY);
+        if (gamepad1.a) {
+            reverseControl = true;
+        } else if (gamepad1.b) {
+            reverseControl = false;
+        }
 
-        double c2_RightY = -gamepad2.right_stick_y;
-        double c2_LeftY = -gamepad2.left_stick_y;
-        setArmPower(c2_RightY);
-        setPivotPower(c2_LeftY);
+        if (reverseControl) {
+            setDrivePower(gamepad1.right_stick_y, gamepad1.left_stick_y);
+        } else {
+            setDrivePower(-gamepad1.left_stick_y, -gamepad1.right_stick_y);
+        }
+		
+        setArmPower(-gamepad2.right_stick_y);
+        setPivotPower(-gamepad2.left_stick_y);
 
-        if (gamepad2.back) {
-            resetDumpEncoder();
-        } else if (gamepad2.right_bumper) {
-            setDumpPosition("right", 90);
-        } else if (gamepad2.left_bumper) {
-            setDumpPosition("left", 90);
+        if (gamepad2.b) {
+            setDumpPower(-1.0f);
         } else if (gamepad2.x) {
-            if (motorDump_Position() > 0) {
-                setDumpPosition("right", 0);
-            }
-            if (motorDump_Position() < 0) {
-                setDumpPosition("left", 0);
-            }
-        } else if (gamepad2.dpad_right) {
-            setDumpPower(-0.1f);
-        } else if (gamepad2.dpad_left) {
-            setDumpPower(0.1f);
+            setDumpPower(1.0f);
         } else {
             setDumpPower(0.0f);
         }
 		
-        if (gamepad2.a) {
+        if (gamepad2.right_stick_button) {
             setLidPosition(0.6f);
-        } else if (gamepad2.b) {
+        } else if (gamepad2.left_stick_button) {
             setLidPosition(0.0f);
         }
 
+        if (gamepad2.right_bumper) {
+            setRightLeverPosition(0.4f);
+        } else if (gamepad2.right_trigger > 0.1f) {
+            setRightLeverPosition(1.0f);
+        }
+        
+        if (gamepad2.left_bumper) {
+            setLeftLeverPosition(0.6f);
+        } else if (gamepad2.left_trigger > 0.1f) {
+            setLeftLeverPosition(0.0f);
+        }
+
+        if (gamepad2.dpad_up) {
+            setClimberPosition(1.0f);
+        } else if (gamepad2.dpad_down) {
+            setClimberPosition(0.0f);
+        }
+        
         updateTelemetry();
     }
 }

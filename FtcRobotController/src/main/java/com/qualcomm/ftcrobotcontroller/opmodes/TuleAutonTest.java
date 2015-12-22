@@ -24,29 +24,13 @@ public class TuleAutonTest extends TuleTelemetry {
             case 1:
                 checkTime();
                 runWithEncoders();
-                linearMove("forward",60,1.0f);
+                setArmPosition("up", 2);
                 break;
             case 2:
                 waitForReset();
                 break;
-            case 3:
-                checkTime();
-                runWithEncoders();
-                linearMove("right",180,1.0f);
-                break;
-            case 4:
-                waitForReset();
-                break;
-            case 5:
-                checkTime();
-                runWithEncoders();
-                linearMove("forward",60,1.0f);
-                break;
-            case 6:
-                waitForReset();
-                break;
             case 999:
-                setDrivePower(0.0f, 0.0f);
+                motorKill();
                 resetDriveEncoders();
                 waitForReset();
                 break;
