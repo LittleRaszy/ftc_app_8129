@@ -62,11 +62,10 @@ public class FtcOpModeRegister implements OpModeRegister {
 //    manager.register("K9Line", K9Line.class);
 //    manager.register ("PushBotAuto", PushBotAuto.class);
 //    manager.register ("PushBotManual", PushBotManual.class);
-      manager.register("Controller", TuleController.class);
-      manager.register("Auton - Test", TuleAutonTest.class);
-      manager.register("Auton - Main Red", TuleAutonMainLeft.class);
-      manager.register("Auton - Main Blue", TuleAutonMainRight.class);
 
+
+
+    manager.register("navX-micro", navXProcessedOp.class);
     /*
      * Uncomment any of the following lines if you want to register an op mode.
      */
