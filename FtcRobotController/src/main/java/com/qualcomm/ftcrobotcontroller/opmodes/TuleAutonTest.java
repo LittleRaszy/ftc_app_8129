@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-public class TuleAutonTest extends TuleTelemetry {
+public class TuleAutonTest extends TuleAutonFunctions {
 
     public TuleAutonTest() {
 
@@ -8,9 +8,7 @@ public class TuleAutonTest extends TuleTelemetry {
 
     @Override
     public void start() {
-        super.start();
-        resetDriveEncoders();
-        resetArmEncoder();
+        autonInit();
     }
 
     @Override
@@ -19,14 +17,6 @@ public class TuleAutonTest extends TuleTelemetry {
             case 0:
                 resetDriveEncoders();
                 resetArmEncoder();
-                waitForReset();
-                break;
-            case 1:
-                checkTime();
-                runWithEncoders();
-                setArmPosition("up", 2);
-                break;
-            case 2:
                 waitForReset();
                 break;
             case 999:

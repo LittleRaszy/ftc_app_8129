@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-public class TuleTelemetry extends TuleHardware {
+public class TuleTelemetry extends TuleFunctions {
 
     public TuleTelemetry() {
 
@@ -10,11 +10,27 @@ public class TuleTelemetry extends TuleHardware {
 
         if (warningGenerated) {
             telemetry.addData("0.0", warningMessage);
+        } else {
+            telemetry.addData("0.0", "No Errors");
         }
 
         telemetry.addData("0.1", "Running for "
                 + (Math.round(1000*getRuntime())/1000) + " seconds");
-
+        telemetry.addData("0.2",
+                "Magnetometer (X,Y,Z): "
+                        + navX_value("rawMagX") + ", "
+                        + navX_value("rawMagY") + ", "
+                        + navX_value("rawMagZ"));
+        telemetry.addData("0.3",
+                "Gyroscope (X,Y,Z): "
+                        + navX_value("rawGyroX") + ", "
+                        + navX_value("rawGyroY") + ", "
+                        + navX_value("rawGyroZ"));
+        telemetry.addData("0.4",
+                "Accelerometer (X,Y,Z): "
+                        + navX_value("rawAccelX") + ", "
+                        + navX_value("rawAccelY") + ", "
+                        + navX_value("rawAccelZ"));
         telemetry.addData("1.0",
                 "Left Drive: "
                         + motorLeft_Power()*100 + "% Power, "

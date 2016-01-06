@@ -1,6 +1,6 @@
 package com.qualcomm.ftcrobotcontroller.opmodes;
 
-public class TuleController extends TuleTelemetry {
+public class TuleController extends TuleControlFunctions {
 
     boolean reverseControl = false;
 
@@ -10,8 +10,7 @@ public class TuleController extends TuleTelemetry {
 
     @Override
     public void start() {
-		
-        super.start();
+		controlInit();
     }
 
     @Override
